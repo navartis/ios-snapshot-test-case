@@ -88,12 +88,12 @@
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "IMAGE_DIFF_DIR"
-            value = "$(SOURCE_ROOT)/$(PROJECT_NAME)Tests/FailedSnapshotImages"
+            value = "$(SOURCE_ROOT)/FBSnapshotTestCaseDemoTests"
             isEnabled = "YES">
          </EnvironmentVariable>
          <EnvironmentVariable
             key = "FB_REFERENCE_IMAGE_DIR"
-            value = "$(SOURCE_ROOT)/$(PROJECT_NAME)Tests/ReferenceImages"
+            value = "$(SOURCE_ROOT)/FBSnapshotTestCaseDemoTests"
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>

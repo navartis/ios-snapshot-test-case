@@ -29,7 +29,8 @@ typedef NS_OPTIONS(NSUInteger, FBSnapshotTestCaseFileNameIncludeOption) {
   FBSnapshotTestCaseFileNameIncludeOptionDevice = 1 << 1,
   FBSnapshotTestCaseFileNameIncludeOptionOS = 1 << 2,
   FBSnapshotTestCaseFileNameIncludeOptionScreenSize = 1 << 3,
-  FBSnapshotTestCaseFileNameIncludeOptionScreenScale = 1 << 4
+  FBSnapshotTestCaseFileNameIncludeOptionScreenScale = 1 << 4,
+  FBSnapshotTestCaseFileNameIncludeTestName = 1 << 5
 };
 
 /**
@@ -48,6 +49,8 @@ BOOL FBSnapshotTestCaseIs64Bit(void);
  @returns An @c NSOrderedSet object containing strings that are appended to the reference images directory.
  */
 NSOrderedSet *FBSnapshotTestCaseDefaultSuffixes(void);
+
+NSOrderedSet *FBSnapshotTestCaseWithoutSuffixes(void);
 
 /**
  Returns a fully normalized file name as per the provided option mask. Strips punctuation and spaces and replaces them with @c _.

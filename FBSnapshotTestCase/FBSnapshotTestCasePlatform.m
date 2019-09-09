@@ -28,6 +28,11 @@ NSOrderedSet *FBSnapshotTestCaseDefaultSuffixes(void)
     }
 }
 
+NSOrderedSet *FBSnapshotTestCaseWithoutSuffixes(void)
+{
+    return [[NSOrderedSet alloc] init];
+}
+
 NSString *FBFileNameIncludeNormalizedFileNameFromOption(NSString *fileName, FBSnapshotTestCaseFileNameIncludeOption option)
 {
     if ((option & FBSnapshotTestCaseFileNameIncludeOptionDevice) == FBSnapshotTestCaseFileNameIncludeOptionDevice) {

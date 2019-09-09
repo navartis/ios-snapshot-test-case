@@ -39,7 +39,8 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
 {
     if (self = [super init]) {
         _folderName = NSStringFromClass(testClass);
-        _fileNameOptions = FBSnapshotTestCaseFileNameIncludeOptionScreenScale;
+
+        _fileNameOptions = FBSnapshotTestCaseFileNameIncludeOptionScreenScale | FBSnapshotTestCaseFileNameIncludeTestName;
 
         _fileManager = [[NSFileManager alloc] init];
     }
@@ -268,17 +269,26 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
             fileName = @"";
             break;
     }
-    fileName = [fileName stringByAppendingString:NSStringFromSelector(selector)];
-    if (0 < identifier.length) {
-        fileName = [fileName stringByAppendingFormat:@"_%@", identifier];
+
+    if ((self.fileNameOptions & FBSnapshotTestCaseFileNameIncludeTestName) == FBSnapshotTestCaseFileNameIncludeTestName) {
+        fileName = [fileName stringByAppendingString:NSStringFromSelector(selector)];
     }
 
     BOOL noFileNameOption = (self.fileNameOptions & FBSnapshotTestCaseFileNameIncludeOptionNone) == FBSnapshotTestCaseFileNameIncludeOptionNone;
     if (!noFileNameOption) {
       fileName = FBFileNameIncludeNormalizedFileNameFromOption(fileName, self.fileNameOptions);
     }
+    
+    if (0 < identifier.length) {
+        fileName = [fileName stringByAppendingFormat:@"_%@", identifier];
+    }
 
     fileName = [fileName stringByAppendingPathExtension:@"png"];
+    NSString *separator = @"_";
+    if ([fileName hasPrefix:separator]) {
+        fileName = [fileName substringFromIndex:[separator length]];
+    }
+    
     return fileName;
 }
 
@@ -288,7 +298,10 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
     NSString *fileName = [self _fileNameForSelector:selector
                                          identifier:identifier
                                        fileNameType:FBTestSnapshotFileNameTypeReference];
-    NSString *filePath = [_referenceImagesDirectory stringByAppendingPathComponent:self.folderName];
+    NSString *folderName = [self.folderName componentsSeparatedByString:@"."][1];
+    folderName = [folderName stringByAppendingFormat:@"/%@/Snapshots", NSStringFromSelector(selector)];
+    
+    NSString *filePath = [_referenceImagesDirectory stringByAppendingPathComponent:folderName];
     filePath = [filePath stringByAppendingPathComponent:fileName];
     return filePath;
 }
@@ -301,7 +314,13 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                          identifier:identifier
                                        fileNameType:fileNameType];
 
-    NSString *filePath = [_imageDiffDirectory stringByAppendingPathComponent:self.folderName];
+//    NSString *filePath = [_imageDiffDirectory stringByAppendingPathComponent:self.folderName];
+
+    NSString *folderName = [self.folderName componentsSeparatedByString:@"."][1];
+    folderName = [folderName stringByAppendingFormat:@"/%@/Snapshots/Failures", NSStringFromSelector(selector)];
+    
+    NSString *filePath = [_referenceImagesDirectory stringByAppendingPathComponent:folderName];
+
     filePath = [filePath stringByAppendingPathComponent:fileName];
     return filePath;
 }
