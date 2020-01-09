@@ -185,7 +185,7 @@ extern NSString *const FBDiffedImageKey;
                       toImage:(UIImage *)image
              overallTolerance:(CGFloat)overallTolerance
                         error:(NSError **)errorPtr
-              differentPixels:(NSMutableArray **)differentPixels
+              differentPixels:(NSMutableArray *_Nullable*_Nullable)differentPixels
 ;
 
 /**
@@ -203,7 +203,7 @@ extern NSString *const FBDiffedImageKey;
             perPixelTolerance:(CGFloat)perPixelTolerance
              overallTolerance:(CGFloat)overallTolerance
                         error:(NSError **)errorPtr
-              differentPixels:(NSMutableArray **)differentPixels;
+              differentPixels:(NSMutableArray *_Nullable*_Nullable)differentPixels;
 
 /**
  Saves the reference image and the test image to `failedOutputDirectory`.
