@@ -177,7 +177,9 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                                         NSLocalizedFailureReasonErrorKey : errorReason,
                                         FBReferenceImageKey : referenceImage,
                                         FBCapturedImageKey : image,
-                                        FBDiffedImageKey : [referenceImage fb_diffWithImage:image differentPixels:*differentPixels],
+                                        FBDiffedImageKey : [referenceImage fb_diffWithImage:image
+                                                                            differentPixels:*differentPixels
+                                                                              hotFixResolutionIssue:_hotFixResolutionIssue],
                                     }];
     }
     return NO;
@@ -190,7 +192,7 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                            error:(NSError **)errorPtr
                  differentPixels:(NSArray *)differentPixels
 {
-    UIImage *diffImage = [referenceImage fb_diffWithImage:testImage differentPixels:differentPixels];
+    UIImage *diffImage = [referenceImage fb_diffWithImage:testImage differentPixels:differentPixels hotFixResolutionIssue:_hotFixResolutionIssue];
 
     [XCTContext runActivityNamed:identifier ?: NSStringFromSelector(selector) block:^(id<XCTActivity> _Nonnull activity) {
         XCTAttachment *referenceAttachment = [XCTAttachment attachmentWithImage:referenceImage];
@@ -424,13 +426,24 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
     return didWrite;
 }
 
+- (UIImage *)_normalizeDPI:(UIImage *)image {
+    NSData *imageData = UIImagePNGRepresentation(image);
+    return [[UIImage alloc] initWithData:imageData];
+}
+
 - (UIImage *)_imageForViewOrLayer:(id)viewOrLayer
 {
     if ([viewOrLayer isKindOfClass:[UIView class]]) {
         if (_usesDrawViewHierarchyInRect) {
             return [UIImage fb_imageForView:viewOrLayer];
         } else {
-            return [UIImage fb_imageForViewLayer:viewOrLayer];
+//            return [UIImage fb_imageForViewLayer:viewOrLayer];
+            UIImage *image = [UIImage fb_imageForViewLayer:viewOrLayer];
+
+            if (_hotFixResolutionIssue) {
+                return [self _normalizeDPI:image];
+            }
+            return image;
         }
     } else if ([viewOrLayer isKindOfClass:[CALayer class]]) {
         return [UIImage fb_imageForLayer:viewOrLayer];

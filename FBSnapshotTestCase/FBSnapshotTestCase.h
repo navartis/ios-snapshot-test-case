@@ -142,6 +142,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic, assign) BOOL highlightDifferentPixels;
 
 /**
+ When YES, will fix resolution issue for separate views testing.
+ */
+@property (readwrite, nonatomic, assign) BOOL hotFixResolutionIssue;
+
+/**
  When set, allows fine-grained control over what you want the file names to include.
 
  Allows you to combine which device or simulator specific details you want in your snapshot file names.

@@ -32,7 +32,7 @@
 
 @implementation UIImage (Diff)
 
-- (UIImage *)fb_diffWithImage:(UIImage *)image differentPixels:(NSArray *)differentPixels
+- (UIImage *)fb_diffWithImage:(UIImage *)image differentPixels:(NSArray *)differentPixels hotFixResolutionIssue:(BOOL)hotFixResolutionIssue
 {
     if (!image) {
         return nil;
@@ -51,8 +51,11 @@
     
     if (differentPixels) {
         CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
-        
-        CGFloat screenScale = [[UIScreen mainScreen] scale];
+
+        CGFloat screenScale = 1;
+        if (!hotFixResolutionIssue) {
+            screenScale = [[UIScreen mainScreen] scale];
+        }
         const NSUInteger pixelCount = differentPixels.count;
         for (NSUInteger n = 0; n < pixelCount; ++n) {
             int pixelNumber = [differentPixels[n] intValue] / screenScale;

@@ -50,6 +50,17 @@
     _snapshotController.highlightDifferentPixels = highlightDifferentPixels;
 }
 
+- (BOOL)hotFixResolutionIssue
+{
+    return _snapshotController.hotFixResolutionIssue;
+}
+
+- (void)sethotFixResolutionIssue:(BOOL)hotFixResolutionIssue
+{
+    NSAssert1(_snapshotController, @"%s cannot be called before [super setUp]", __FUNCTION__);
+    _snapshotController.hotFixResolutionIssue = hotFixResolutionIssue;
+}
+
 - (FBSnapshotTestCaseFileNameIncludeOption)fileNameOptions
 {
     return _snapshotController.fileNameOptions;
