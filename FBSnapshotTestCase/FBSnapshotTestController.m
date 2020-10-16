@@ -123,17 +123,15 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
         NSArray *dirItems = [_fileManager contentsOfDirectoryAtPath:dirPath
                                                               error:NULL];
 
+        NSString *expectingFileName = [filePath lastPathComponent];
+
         FBSnapshotTestCaseFileNameIncludeOption option = self.fileNameOptions;
         NSString *additionalFileNameFilter = [[NSString alloc] init];
 
-        if ((option & FBSnapshotTestCaseFileNameIncludeOptionScreenSize) == FBSnapshotTestCaseFileNameIncludeOptionScreenSize) {
-            CGSize screenSize = [UIScreen mainScreen].bounds.size;
-            additionalFileNameFilter = [additionalFileNameFilter stringByAppendingFormat:@"_%.0fx%.0f", screenSize.width, screenSize.height];
-        }
-
-        if ((option & FBSnapshotTestCaseFileNameIncludeOptionScreenScale) == FBSnapshotTestCaseFileNameIncludeOptionScreenScale) {
-            CGFloat screenScale = [[UIScreen mainScreen] scale];
-            additionalFileNameFilter = [additionalFileNameFilter stringByAppendingFormat:@"@%.fx", screenScale];
+        if ((option & FBSnapshotTestCaseFileNameIncludeOptionOS) == FBSnapshotTestCaseFileNameIncludeOptionOS) {
+            UIDevice *device = [UIDevice currentDevice];
+            NSString *osMarker = [device.systemVersion stringByReplacingOccurrencesOfString:@"." withString:@"_"];
+            additionalFileNameFilter = [[expectingFileName componentsSeparatedByString: osMarker] lastObject];
         }
 
         NSMutableArray *fileNames = [[NSMutableArray alloc] init];
