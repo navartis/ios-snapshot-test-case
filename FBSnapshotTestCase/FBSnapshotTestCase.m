@@ -250,6 +250,7 @@
     _snapshotController.referenceImagesDirectory = referenceImagesDirectory;
     UIImage *referenceImage = [_snapshotController referenceImageForSelector:self.invocation.selector
                                                                   identifier:identifier
+                                                         isSearchAlternative:NO
                                                                        error:errorPtr];
 
     return (referenceImage != nil);

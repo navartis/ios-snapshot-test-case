@@ -170,11 +170,13 @@ extern NSString *const FBDiffedImageKey;
  Loads a reference image.
  @param selector The test method being run.
  @param identifier The optional identifier, used when multiple images are tested in a single -test method.
+ @param isSearchAlternative search snapshot for a previos iOS version
  @param errorPtr An error, if this methods returns nil, the error will be something useful.
  @returns An image.
  */
 - (nullable UIImage *)referenceImageForSelector:(SEL)selector
                                      identifier:(nullable NSString *)identifier
+                            isSearchAlternative:(BOOL)isSearchAlternative
                                           error:(NSError **)errorPtr;
 
 /**

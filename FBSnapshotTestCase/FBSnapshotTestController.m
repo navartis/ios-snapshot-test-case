@@ -113,13 +113,53 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
 
 - (UIImage *)referenceImageForSelector:(SEL)selector
                             identifier:(NSString *)identifier
+                   isSearchAlternative:(BOOL)isSearchAlternative
                                  error:(NSError **)errorPtr
 {
     NSString *filePath = [self _referenceFilePathForSelector:selector identifier:identifier];
+    if (isSearchAlternative) {
+        NSString *dirPath = [filePath stringByDeletingLastPathComponent];
+
+        NSArray *dirItems = [_fileManager contentsOfDirectoryAtPath:dirPath
+                                                              error:NULL];
+
+        FBSnapshotTestCaseFileNameIncludeOption option = self.fileNameOptions;
+        NSString *additionalFileNameFilter = [[NSString alloc] init];
+
+        if ((option & FBSnapshotTestCaseFileNameIncludeOptionScreenSize) == FBSnapshotTestCaseFileNameIncludeOptionScreenSize) {
+            CGSize screenSize = [UIScreen mainScreen].bounds.size;
+            additionalFileNameFilter = [additionalFileNameFilter stringByAppendingFormat:@"_%.0fx%.0f", screenSize.width, screenSize.height];
+        }
+
+        if ((option & FBSnapshotTestCaseFileNameIncludeOptionScreenScale) == FBSnapshotTestCaseFileNameIncludeOptionScreenScale) {
+            CGFloat screenScale = [[UIScreen mainScreen] scale];
+            additionalFileNameFilter = [additionalFileNameFilter stringByAppendingFormat:@"@%.fx", screenScale];
+        }
+
+        NSMutableArray *fileNames = [[NSMutableArray alloc] init];
+        [dirItems enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            NSString *fileName = (NSString *)obj;
+            NSString *extension = [[fileName pathExtension] lowercaseString];
+            if ([extension isEqualToString:@"png"] && [fileName containsString:additionalFileNameFilter]) {
+                [fileNames addObject:fileName];
+            }
+        }];
+
+        NSArray *sortedArray = [fileNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+
+        NSString *fileName = [sortedArray lastObject];
+        if (fileName) {
+            filePath = [dirPath stringByAppendingPathComponent:fileName];
+        }
+    }
+
     UIImage *image = [UIImage imageWithContentsOfFile:filePath];
     if (image == nil && errorPtr != NULL) {
         BOOL exists = [_fileManager fileExistsAtPath:filePath];
         if (!exists) {
+            if (!isSearchAlternative) {
+                return [self referenceImageForSelector:selector identifier:identifier isSearchAlternative:YES error:errorPtr];
+            }
             *errorPtr = [NSError errorWithDomain:FBSnapshotTestControllerErrorDomain
                                             code:FBSnapshotTestControllerErrorCodeNeedsRecord
                                         userInfo:@{
@@ -341,7 +381,10 @@ typedef NS_ENUM(NSUInteger, FBTestSnapshotFileNameType) {
                               overallTolerance:(CGFloat)overallTolerance
                                          error:(NSError **)errorPtr
 {
-    UIImage *referenceImage = [self referenceImageForSelector:selector identifier:identifier error:errorPtr];
+    UIImage *referenceImage = [self referenceImageForSelector:selector
+                                                   identifier:identifier
+                                          isSearchAlternative:NO
+                                                        error:errorPtr];
     if (referenceImage != nil) {
         UIImage *snapshot = [self _imageForViewOrLayer:viewOrLayer];
         
